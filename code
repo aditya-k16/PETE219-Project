@@ -241,3 +241,35 @@ for ax in [ax2, ax3]:
     
 plt.tight_layout()
 fig.subplots_adjust(wspace = 0.15)
+
+
+#Effective Stress
+#defining function for vertical effective stress and plotting against depth
+#Using formula Sv=RHOB*G*Depth
+
+def Stress_eff(r,d):
+    SV=(r*1000)*(d/3.281)*9.81
+    return SV
+
+df["EFFECTIVE_STRESS"] = Stress_eff(df['RHOB'],df['DEPTH'])
+
+left_col_value = 0
+right_col_value = 250
+curve = df['EFFECTIVE_STRESS']
+span = abs(left_col_value - right_col_value)
+cmap = plt.get_cmap('summer_r')
+color_index = np.arange(left_col_value, right_col_value, span / 100)
+ax = df.plot(x='EFFECTIVE_STRESS', y='DEPTH', c='black', lw=0.5, legend=False, figsize=(7,10))
+plt.ylim(5050, 0)
+plt.xlim(0,0.075e+09)
+plt.tick_params(axis='both', which='major', labelsize=10, labelbottom = False, bottom=False, top = False, labeltop=True)
+plt.ylabel("Depth (ft)")
+plt.title('EFFECTIVE STRESS VS DEPTH')
+ax.set_xlabel("Effective stress (Pa)")
+ax.xaxis.set_label_position('top') 
+
+for index in sorted(color_index):
+    index_value = (index - left_col_value)/span
+    color = cmap(index_value) 
+    plt.fill_betweenx(df['DEPTH'] , curve, where = curve >= index,  color = color)
+plt.show()
